@@ -9,6 +9,7 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
+app.use(express.static('uploads'));
 const db = admin.firestore();
 
 app.use(fileUpload());
@@ -69,12 +70,17 @@ app.delete('/productos/:id', async (req, res) => {
     }
 });
   
+//cors
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
   
 
 //subir imagen indicando el nombre del producto y pasando una imagen 
 app.put('/upload/producto/:nombre',(req,res)=>{
-
-    
 
     let nombre = req.params.nombre;
     if(!req.files){
@@ -84,6 +90,7 @@ app.put('/upload/producto/:nombre',(req,res)=>{
             errors: {message: 'debe de selccionar una imagen'}
         });
     }
+    console.log(nombre)
 
     //obtener nombre del archivo
 
@@ -106,8 +113,7 @@ app.put('/upload/producto/:nombre',(req,res)=>{
     }
 
     let nombreArchivo = `${nombre}-${new Date().getMilliseconds()}.${extensionArchivo}`;
-    let path1= './uploads/productos/${nombreArchivo}';
-    let path= `./uploads/productos/${nombreArchivo}` ;
+    let path= `./uploads/${nombreArchivo}` ;
     console.log(path);
 
     archivo.mv(path, err=>{

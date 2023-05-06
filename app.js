@@ -11,12 +11,18 @@ admin.initializeApp({
 
 app.use(express.static('uploads'));
 const db = admin.firestore();
-
 app.use(fileUpload());
 app.use(bodyParser.json());
 
 
 app.use(bodyParser.urlencoded({extended:true}));
+//cors
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
 app.listen(3000,()=>{
     console.log('Express server - puerto 3000 online')
@@ -41,15 +47,15 @@ app.post('/addProducto', async (req, res) => {
 });
 
 
-// Creamos una referencia a la colección de productos en Firestore
-const productosRef = admin.firestore().collection('productos');
-
 
 // Definimos la ruta para eliminar un producto por su ID
 app.delete('/productos/:id', async (req, res) => {
+   
     try {
       const id = req.params.id;
-  
+      // Creamos una referencia a la colección de productos en Firestore
+      const productosRef = admin.firestore().collection('productos');
+      
       // Creamos una referencia al documento del producto que deseamos eliminar
       const productoRef = productosRef.doc(id);
   
@@ -70,19 +76,12 @@ app.delete('/productos/:id', async (req, res) => {
     }
 });
   
-//cors
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
+
   
 
-//subir imagen indicando el nombre del producto y pasando una imagen 
-app.put('/upload/producto/:nombre',(req,res)=>{
-
-    let nombre = req.params.nombre;
+//subir imagen indicando el id del producto y pasando una imagen 
+app.put('/upload/producto/:nombre',async (req,res)=>{
+    let nombre = req.params.nombre;  
     if(!req.files){
         return res.status(400).json({
             ok:false,
@@ -90,7 +89,7 @@ app.put('/upload/producto/:nombre',(req,res)=>{
             errors: {message: 'debe de selccionar una imagen'}
         });
     }
-    console.log(nombre)
+    
 
     //obtener nombre del archivo
 
@@ -112,9 +111,10 @@ app.put('/upload/producto/:nombre',(req,res)=>{
         });
     }
 
-    let nombreArchivo = `${nombre}-${new Date().getMilliseconds()}.${extensionArchivo}`;
+    let nombreArchivo = `${nombre}.${extensionArchivo}`;
     let path= `./uploads/${nombreArchivo}` ;
     console.log(path);
+    
 
     archivo.mv(path, err=>{
         if (err){
@@ -131,101 +131,25 @@ app.put('/upload/producto/:nombre',(req,res)=>{
         });
     })
 
-
-});
-
-
-
-
-
-
-
-
-
-/*
-
-app.get('/', (req,res, next)=>{
-    res.status(200).json({
-        ok:true,
-        mensaje:'peticion realizada correctamente'
-    })
-});
-
-
-
-
-
-//get prodcuts
-app.get('/productos', function(req,res){
-    mc.query('SELECT * FROM productos',function(error,results,fields){
-        if (error) throw error;
-        return res.send({
-            error: false,
-            data:results,
-            message: 'Lista de productos.'
+    // Creamos una referencia a la colección de productos en Firestore
+    const productosRef = admin.firestore().collection('productos');
+    // Filtrar documentos donde el campo "nombre" sea igual al nombre proporcionado
+    const query = productosRef.where('nombre', '==', nombre);
+    // Obtener los documentos que cumplen con el filtro
+    query.get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        // Establecer el nuevo dato en cada documento
+        const docRef = productosRef.doc(doc.id);
+        docRef.update({ imagen: nombreArchivo })
+        .then(() => {
+            console.log("Dato actualizado en el documento:", doc.id);
+        })
+        .catch((error) => {
+            console.log("Error al actualizar el dato en el documento:", doc.id, error);
         });
-    })
-    
-});
-
-
-app.post('/producto',function(req,res){
-    let datosProducto = {
-        //id incremental
-        productName: req.body.name,
-        releaseDate: req.body.date,
-        productCode: req.body.code,
-        price: parseInt(req.body.price),
-        description: req.body.description,
-        starRating: parseInt(req.body.rating),
-        imageUrl: req.body.image
-    }
-    console.log(datosProducto); 
-    if (mc){
-        mc.query("INSERT INTO productos SET ?", datosProducto, function(error,result){
-            if(error){
-                res.status(500).json({"Mensaje": error});
-            }else{
-                res.status(201).json({"Mensaje":"insertado"});
-            }
-        });
-    }
-});
-
-app.delete('/producto/:id',function(req,res){
-    let id= req.params.id
-    if (mc){
-        console.log(id);
-        mc.query("DELETE FROM productos WHERE  productId = ?", id, function(error,result){
-            if(error){
-                res.status(500).json({"Mensaje": error});
-            }else{
-                res.status(200).json({"Mensaje":"registro con id="+ id + "borrado"});
-            }
-        });
-    }
-});
-
-app.put('/producto/:id',(req,res)=>{
-    let id= req.params.id
-    let producto =req.body;
-    console.log(id)
-    console.log(producto);
-
-    if(!id|| !producto){
-        return res.status(400).send({error: producto, message: 'Debe proveer un id y los datos de un producto'})
-    }
-
-    
-    mc.query("UPDATE productos SET ? WHERE productId = ?", [producto,id], function(error,result, fields){
-        if(error)throw error;
-        return res.status(200).json({"Mensaje":"registro con id="+ id + "actualizado"});
-        
+    });
+    }).catch((error) => {
+    console.log("Error al obtener los documentos:", error);
     });
     
 });
-
-
-
-
-*/

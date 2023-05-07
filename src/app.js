@@ -47,11 +47,22 @@ app.listen(3000,()=>{
 
 //get productos firebase
 app.get('/getProductos', async (req, res) => {
-    const snapshot = await db.collection('productos').get();
-    const documentos = snapshot.docs.map(doc => doc.data());
-    res.send(documentos);
-    console.log(documentos);
+    try {
+      const snapshot = await db.collection('productos').get();
+      const documentos = snapshot.docs.map(doc => {
+        return {
+          id: doc.id,
+          ...doc.data()
+        };
+      });
+      res.send(documentos);
+      console.log(documentos);
+    } catch (error) {
+      console.log('Error obteniendo los documentos:', error);
+      res.status(500).send('Error obteniendo los documentos');
+    }
 });
+  
 
 //añadir producto 
 app.post('/addProducto', async (req, res) => {

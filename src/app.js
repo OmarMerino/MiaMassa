@@ -2,14 +2,29 @@ var express = require('express');
 const admin = require('firebase-admin');
 const bodyParser= require('body-parser');
 const fileUpload= require('express-fileupload');
-const serviceAccount = require('./serviceAccountKey.json');
+const serviceAccount = require('../serviceAccountKey.json');
+const path = require('path');
+
+// ...
 var app=express();
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-app.use(express.static('uploads'));
+
+
+const uploadsPath = path.join(__dirname, '..', 'uploads');
+app.use(express.static(uploadsPath));
+
+
+
+
+
+
+
+app.use(express.static(uploadsPath));
+
 const db = admin.firestore();
 app.use(fileUpload());
 app.use(bodyParser.json());

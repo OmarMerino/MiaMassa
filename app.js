@@ -50,7 +50,6 @@ app.post('/addProducto', async (req, res) => {
 
 // Definimos la ruta para eliminar un producto por su ID
 app.delete('/productos/:id', async (req, res) => {
-   
     try {
       const id = req.params.id;
       // Creamos una referencia a la colección de productos en Firestore

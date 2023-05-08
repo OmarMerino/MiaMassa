@@ -1,17 +1,16 @@
 var express = require ('express')
 const bodyParser= require('body-parser');
 const fileUpload= require('express-fileupload');
-const serviceAccount = require('../serviceAccountKey.json');
 const path = require('path');
-const admin = require('firebase-admin')
+//const admin = require('firebase-admin')
 // ...
 var app=express();
 
-admin.initializeApp({
+/*admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
-});
+});*/
 
-const db = admin.firestore();
+//const db = admin.firestore();
 
 const uploadsPath = path.join(__dirname, '..', 'uploads');
 app.use(express.static(uploadsPath));
@@ -42,7 +41,5 @@ app.listen(3000,()=>{
 
 //Export para usar la conexion a la Base de Datos en Rutas y Controladores
 module.exports = {
-    app,
-    admin,
-    db
-}
+    app
+};

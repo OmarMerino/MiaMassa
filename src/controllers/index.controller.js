@@ -1,31 +1,29 @@
 //Base de datos
-const { db } = require('../app');
+const express = require('express');
+const app = require('../app');
+const db = require('../firebase');
 
 //Añadir las funciones al Controlador para que se puedan invocar en Rutas
-const controller = {
-    getProductos: getProductos(db)
-}
+const controller = {}
 
 
 //Get Productos.
-function getProductos(db) {
-    return async function(req, res) {
-      try {
-        const snapshot = await db.collection('productos').get();
-        const documentos = snapshot.docs.map(doc => {
-          return {
-            id: doc.id,
-            ...doc.data()
-          };
-        });
-        res.send(documentos);
-        console.log(documentos);
-      } catch (error) {
-        console.log('Error obteniendo los documentos:', error);
-        res.status(500).send('Error obteniendo los documentos');
-      }
-    }
-}
+controller.getProductos = async (req, res) => {
+  try {
+    const snapshot = await db.collection('productos').get();
+    const documentos = snapshot.docs.map(doc => {
+      return {
+        id: doc.id,
+        ...doc.data()
+      };
+    });
+    res.send(documentos);
+    console.log(documentos);
+  } catch (error) {
+    console.log('Error obteniendo los documentos:', error);
+    res.status(500).send('Error obteniendo los documentos');
+  }
+};
 
 //Add producto.
 controller.addProducto = async (req, res) => {
@@ -137,7 +135,4 @@ controller.putProducto = async (req,res)=>{
     
 };
 
-module.exports = controller
-module.exports = {
-    getProductos
-};
+module.exports = controller;

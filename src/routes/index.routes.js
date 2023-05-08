@@ -2,23 +2,29 @@ const express = require ('express')
 const router = express.Router()
 const controller = require('../controllers/index.controller')
 
-//Base de datos
-const { db } = require('../app')
-
 //get productos firebase
-router.get('/getProductos', controller.getProductos(db))
+
+router.get('/getProductos', (req, res) => {
+    controller.getProductos(req, res);
+});
   
 
 //añadir producto 
-//router.post('/addProducto', controller.addProductos)
+router.post('/addProducto', (req, res) => {
+    controller.addProductos(req, res);
+});
 
 
 // Definimos la ruta para eliminar un producto por su ID
-//router.delete('/productos/:id', controller.productos)
+router.delete('/productos/:id', (req, res) => {
+    controller.productos(req, res);
+});
 
 
 //subir imagen indicando el id del producto y pasando una imagen 
-//router.put('/upload/producto/:nombre', controller.putProducto)
+router.put('/upload/producto/:nombre', (req, res) => {
+    controller.putProducto(req, res);
+});
 
 
 //Export para que se puedan utilizar en cualquier archivo las Rutas

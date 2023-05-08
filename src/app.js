@@ -35,8 +35,8 @@ app.use((req, res, next) => {
 const routes = require('./routes/index.routes')
 app.use(routes)
 
-app.listen(3000,()=>{
-    console.log('Express server - puerto 3000 online')
+app.listen(8000,()=>{
+    console.log('Express server - puerto 8000 online')
 });
 
 //Export para usar la conexion a la Base de Datos en Rutas y Controladores

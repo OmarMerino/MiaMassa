@@ -34,6 +34,8 @@ app.use((req, res, next) => {
 //Rutas
 const routes = require('./routes/index.routes')
 app.use(routes)
+const agregadoRoute = require('./routes/agregados.routes')
+app.use(agregadoRoute)
 
 app.listen(8000,()=>{
     console.log('Express server - puerto 8000 online')

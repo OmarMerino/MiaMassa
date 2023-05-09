@@ -7,6 +7,79 @@ const { db, admin } = require('../firebase');
 const controller = {}
 
 
+controller.habilitarProducto = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log(id)
+    // Creamos una referencia a la colección de productos en Firestore
+    const productosRef = admin.firestore().collection('productos');
+    
+    // Creamos una referencia al documento del producto que deseamos editar
+    const productoRef = productosRef.doc(id);
+
+    // Obtenemos el documento actual
+    const doc = await productoRef.get();
+
+    
+    // Si el documento no existe, retornamos un error 404
+    if (!doc.exists) {
+      res.status(404).send('No se encontró el producto');
+    } else {
+      // Si el documento existe, lo eliminamos
+      await productoRef.update({
+        disponibilidad: true
+      })
+        .then(() => {
+          console.log('Documento actualizado correctamente');
+        })
+        .catch((error) => {
+          console.error('Error al actualizar el documento:', error);
+        });
+      res.send('Producto id:'+id+' Habilitado');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Ocurrió un error al habilitar el producto');
+  }
+};
+
+controller.deshabilitarProducto = async (req, res) => {
+  try {
+    const id = req.params.id;
+    // Creamos una referencia a la colección de productos en Firestore
+    const productosRef = admin.firestore().collection('productos');
+    
+    // Creamos una referencia al documento del producto que deseamos editar
+    const productoRef = productosRef.doc(id);
+
+    // Obtenemos el documento actual
+    const doc = await productoRef.get();
+
+    
+    // Si el documento no existe, retornamos un error 404
+    if (!doc.exists) {
+      res.status(404).send('No se encontró el producto');
+    } else {
+      // Si el documento existe, lo eliminamos
+      await productoRef.update({
+        disponibilidad: false
+      })
+        .then(() => {
+          console.log('Documento actualizado correctamente');
+        })
+        .catch((error) => {
+          console.error('Error al actualizar el documento:', error);
+        });
+      res.send('Producto id:'+id+' deshabilitado');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Ocurrió un error al deshabilitar el producto');
+  }
+};
+
+
+
 //Get Productos.
 controller.getProductos = async (req, res) => {
   try {

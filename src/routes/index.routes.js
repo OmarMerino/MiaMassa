@@ -4,6 +4,15 @@ const controller = require('../controllers/index.controller')
 
 //get productos firebase
 
+
+router.put('/habilitarProducto/:id', (req, res) => {
+    controller.habilitarProducto(req, res);
+});
+
+router.put('/deshabilitarProducto/:id', (req, res) => {
+    controller.deshabilitarProducto(req, res);
+});
+
 router.get('/getProductos', (req, res) => {
     controller.getProductos(req, res);
 });
